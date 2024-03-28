@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String         @id @default(cuid())
+  name      String   
+  username  String         @unique
+  email     String         @unique
+  password  String
+  role      String         // instruktur atau siswa
+
+  // relasi ke model courses
+  courses_  Courses[]
+
+  // relasi ke model Enrollments
+  enrolled  Enrollments[]
+
+  // relasi ke model Posts
+  posts     Post[]
+}
+
+model Courses {
+  id            String        @id @default(cuid())
+  title         String
+  description   String
+  cretaedAt     DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+
+  // relasi dengan tabel User (instruktur)
+  instructor    User          @relation(fields: [instructor_id], references: [id])
+  instructor_id String
+
+  // relasi dengan tabel Modul
+  modules       Modules[]
+
+  // relasi dengan tabel Enrollments
+  enrollments   Enrollments[]
+
+  // relasi dengan tabel Posts
+  posts         Post[]
+}
+
+model Modules {
+  id            String   @id @default(cuid())
+  title         String
+  content       String
+  
+  // relasi dengan tabel Courses
+  course        Courses  @relation(fields: [course_id], references: [id])
+  course_id     String
+}
+
+model Enrollments {
+  id            String   @id @default(cuid())
+
+  // relasi dengan tabel User
+  user          User     @relation(fields: [user_id], references: [id])
+  user_id       String
+
+  // relasi dengan tabel Courses
+  course        Courses  @relation(fields: [course_id], references: [id])
+  course_id     String
+
+  // progress belajar
+  progress      Int
+}
+
+model Post {
+  id             String   @id @default(cuid())
+  content        String
+
+  // relasi dengan tabel User
+  user           User     @relation(fields: [user_id], references: [id])
+  user_id        String
+
+  // relasi dengan tabel Courses
+  course         Courses  @relation(fields: [course_id], references: [id])
+  course_id      String
+
+  // Relasi dengan dirinya sendiri (hubungan induk-anak)
+  parentPost    Post?    @relation("ParentPost", fields: [parent_post_id], references: [id])
+  parent_post_id  String?
+  childPosts    Post[]   @relation("ParentPost")
+}
