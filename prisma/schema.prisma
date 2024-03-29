@@ -20,6 +20,7 @@ model User {
   email     String         @unique
   password  String
   role      String         // instruktur atau siswa
+  cretaedAt DateTime       @default(now())
 
   // relasi ke model courses
   courses_  Courses[]
@@ -28,7 +29,7 @@ model User {
   enrolled  Enrollments[]
 
   // relasi ke model Posts
-  posts     Post[]
+  posts     Posts[]
 }
 
 model Courses {
@@ -49,7 +50,7 @@ model Courses {
   enrollments   Enrollments[]
 
   // relasi dengan tabel Posts
-  posts         Post[]
+  posts         Posts[]
 }
 
 model Modules {
@@ -77,7 +78,7 @@ model Enrollments {
   progress      Int
 }
 
-model Post {
+model Posts {
   id             String   @id @default(cuid())
   content        String
 
@@ -90,7 +91,7 @@ model Post {
   course_id      String
 
   // Relasi dengan dirinya sendiri (hubungan induk-anak)
-  parentPost    Post?    @relation("ParentPost", fields: [parent_post_id], references: [id])
+  parentPost    Posts?    @relation("ParentPost", fields: [parent_post_id], references: [id])
   parent_post_id  String?
-  childPosts    Post[]   @relation("ParentPost")
+  childPosts    Posts[]   @relation("ParentPost")
 }
