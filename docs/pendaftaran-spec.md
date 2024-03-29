@@ -3,6 +3,10 @@
 ### Pendaftaran pengguna ke kursus
 
 - Endpoint : 'POST /api/enrollments'
+- Request Header :
+  - Content-Type: application/json
+  - Authorization: Bearer token
+- Role: Student
 - Request Body :
 
 ```json
@@ -36,7 +40,10 @@
 ### Mengambil daftar kursus yang diikuti pengguna
 
 - Endpoint : 'GET /api/enrollments'
-
+- Request Header :
+  - Content-Type: application/json
+  - Authorization: Bearer token
+- Role: Instructor
 - Response Sukses (Status Code: 200 OK) :
 
 ```json
@@ -49,5 +56,13 @@
       "progress": 0
     }
   ]
+}
+```
+
+- Error Response (Status Code: 400 Bad Request) :
+
+```json
+{
+  "message": "User not found."
 }
 ```

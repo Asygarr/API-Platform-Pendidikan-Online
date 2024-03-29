@@ -25,8 +25,7 @@
     "username": "string",
     "email": "string",
     "role": "string",
-    "createdAt": "string",
-    "updatedAt": "string"
+    "createdAt": "date",
   }
 }
 ```
@@ -35,7 +34,7 @@
 
 ```json
 {
-  "message": "Validation error: 'email' must be a valid email address."
+  "message": "Email or Username already exists."
 }
 ```
 
@@ -51,7 +50,7 @@
 }
 ```
 
-- Response Sukses (Status Code: 200 OK) :
+- Response Sukses (Status Code: 201 Created) :
 
 ```json
 {
@@ -64,5 +63,13 @@
 ```json
 {
   "message": "Invalid credentials."
+}
+```
+
+- Error Response Not Found (Status Code: 404 Not Found) :
+
+```json
+{
+  "message": "User not found."
 }
 ```
