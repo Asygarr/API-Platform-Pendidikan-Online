@@ -37,7 +37,7 @@ model Courses {
   title         String
   description   String
   cretaedAt     DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
+  updatedAt     DateTime      @updatedAt
 
   // relasi dengan tabel User (instruktur)
   instructor    User          @relation(fields: [instructor_id], references: [id])
