@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class CreatedCourse {
-  @ApiProperty()
+class DataCreateCourse {
+  @ApiProperty({ example: 'course_id' })
   id: string;
 
   @ApiProperty()
@@ -10,20 +10,55 @@ class CreatedCourse {
   @ApiProperty()
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'instructor_id' })
   instructor_id: string;
 
   @ApiProperty()
   createdAt: Date;
-
-  @ApiProperty()
-  updated_at: Date;
 }
 
-export class SuccesCreatedCourses {
+class DataUpdateCourse {
+  @ApiProperty({ example: 'course_id' })
+  id: string;
+
   @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty({ example: 'instructor_id' })
+  instructor_id: string;
+
+  @ApiProperty()
+  updatedAt: Date;
+}
+
+export class CreateCourses {
+  @ApiProperty({ example: 'Courses created successfully.' })
   message: string;
 
   @ApiProperty()
-  data: CreatedCourse;
+  data: DataCreateCourse;
+}
+
+export class UpdateCourses {
+  @ApiProperty({ example: 'Courses updated successfully.' })
+  message: string;
+
+  @ApiProperty()
+  data: DataUpdateCourse;
+}
+
+export class DeleteCourses {
+  @ApiProperty()
+  message: string;
+}
+
+export class GetCourses {
+  @ApiProperty({ example: 'Courses retrieved successfully.' })
+  message: string;
+
+  @ApiProperty({ type: [DataCreateCourse] })
+  data: DataCreateCourse[];
 }

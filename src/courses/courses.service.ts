@@ -7,7 +7,7 @@ import { PrismaService } from '../connection/prisma.service';
 export class CoursesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createCourse: CreateCourse, @Req() req: any) {
+  async create(createCourse: CreateCourse, req: any) {
     const { title, description } = createCourse;
     const instructor_id = req.user.id;
 
@@ -34,22 +34,109 @@ export class CoursesService {
         description: createCourses.description,
         instructor_id: createCourses.instructor_id,
         cretaedAt: createCourses.cretaedAt,
-        updated_at: createCourses.updated_at,
       },
     };
 
     return responses;
   }
 
-  findAll() {
-    return `This action returns all courses`;
+  async findAll() {
+    const courses = await this.prisma.courses.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        instructor_id: true,
+        cretaedAt: true,
+      },
+    });
+
+    const response = {
+      message: 'Courses retrieved successfully.',
+      data: courses,
+    };
+
+    return response;
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(id: string, updateCourseDto: UpdateCourseDto, req: any) {
+    const { title, description } = updateCourseDto;
+    const instructor_id = req.user.id;
+
+    if (!title || !description) {
+      throw new HttpException(
+        'Title or Description is required.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const cekCourse = await this.prisma.courses.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!cekCourse) {
+      throw new HttpException('Course not found.', HttpStatus.NOT_FOUND);
+    }
+
+    if (cekCourse.instructor_id !== instructor_id) {
+      throw new HttpException(
+        'You are not authorized to update this course.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const updateCourse = await this.prisma.courses.update({
+      where: {
+        id,
+      },
+      data: {
+        title: title,
+        description: description,
+      },
+    });
+
+    const response = {
+      message: 'Courses updated successfully.',
+      data: {
+        id: updateCourse.id,
+        title: updateCourse.title,
+        description: updateCourse.description,
+        instructor_id: updateCourse.instructor_id,
+        updatedAt: updateCourse.updatedAt,
+      },
+    };
+
+    return response;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(id: string, req: any) {
+    const cekCourse = await this.prisma.courses.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!cekCourse) {
+      throw new HttpException('Course not found.', HttpStatus.NOT_FOUND);
+    }
+
+    if (cekCourse.instructor_id !== req.user.id) {
+      throw new HttpException(
+        'You are not authorized to delete this course.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    await this.prisma.courses.delete({
+      where: {
+        id,
+      },
+    });
+
+    return {
+      message: 'Courses deleted successfully.',
+    };
   }
 }
