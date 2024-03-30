@@ -24,7 +24,8 @@
     "id": "course_id",
     "title": "string",
     "description": "string",
-    "instructor_id": "instructor_id"
+    "instructor_id": "instructor_id",
+    "cretaedAt": "date"
   }
 }
 ```
@@ -33,7 +34,7 @@
 
 ```json
 {
-  "message": "Title is required."
+  "message": "Title or Description is required."
 }
 ```
 
@@ -45,12 +46,12 @@
 - Role: Instructor
 - Request Body :
 
-  ```json
-  {
-    "title": "string",
-    "description": "string"
-  }
-  ```
+```json
+{
+  "title": "string",
+  "description": "string"
+}
+```
 
 - Response Sukses (Status Code: 200 OK) :
 
@@ -61,7 +62,8 @@
     "id": "course_id",
     "title": "string",
     "description": "string",
-    "instructor_id": "instructor_id"
+    "instructor_id": "instructor_id",
+    "updatedAt": "date"
   }
 }
 ```
@@ -70,7 +72,23 @@
 
 ```json
 {
-  "message": "Title is required."
+  "message": "Title or Description is required."
+}
+```
+
+- Error Response (Status Code: 404 Not Found) :
+
+```json
+{
+  "message": "Course not found."
+}
+```
+
+- Error Response (Status code: 401 Unauthorized) :
+
+```json
+{
+  "message": "You are not authorized to update this course."
 }
 ```
 
@@ -96,6 +114,14 @@
 }
 ```
 
+- Error Response (Status code: 401 Unauthorized) :
+
+```json
+{
+  "message": "You are not authorized to delete this course."
+}
+```
+
 ### Mengambil daftar kursus
 
 - Endpoint : 'GET /api/courses'
@@ -105,12 +131,14 @@
 
 ```json
 {
+  "message": "Courses retrieved successfully.",
   "data": [
     {
       "id": "course_id",
       "title": "string",
       "description": "string",
-      "instructor_id": "instructor_id"
+      "instructor_id": "instructor_id",
+      "createdAt": "date"
     }
   ]
 }
