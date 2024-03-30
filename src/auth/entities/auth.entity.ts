@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class Data {
+class DataAuth {
   @ApiProperty()
   id: string;
 
@@ -17,15 +17,15 @@ class Data {
   createdAt: Date;
 }
 
-export class Register {
-  @ApiProperty()
+export class RegisterUser {
+  @ApiProperty({ example: 'User registered successfully.' })
   message: string;
 
   @ApiProperty()
-  data: Data;
+  data: DataAuth;
 }
 
 export class LoginUser {
-  @ApiProperty()
+  @ApiProperty({ example: 'JWT Token' })
   token: string;
 }

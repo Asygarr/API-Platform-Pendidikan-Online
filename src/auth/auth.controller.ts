@@ -2,7 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Login, Register } from './dto/create-auth.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { LoginUser } from './entities/auth.entity';
+import { LoginUser, RegisterUser } from './entities/auth.entity';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -12,7 +12,7 @@ export class AuthController {
   @Post('register')
   @ApiCreatedResponse({
     description: 'User registered',
-    type: Register,
+    type: RegisterUser,
   })
   register(@Body() Register: Register) {
     return this.authService.register(Register);
