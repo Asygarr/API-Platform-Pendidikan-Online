@@ -1,33 +1,58 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Put,
+} from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import { CreateCourseDto } from './dto/create-course.dto';
+import { CreateCourse } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { RoleGuard } from '../role/role.guard';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../role/roles.decorator';
+import { SuccesCreatedCourses } from './entities/course.entity';
 
-@Controller('courses')
+@Controller('api/courses')
+@ApiTags('courses')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Post()
-  create(@Body() createCourseDto: CreateCourseDto) {
-    return this.coursesService.create(createCourseDto);
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur'])
+  @ApiCreatedResponse({
+    description: 'Courses created',
+    type: SuccesCreatedCourses,
+  })
+  create(@Body() createCourse: CreateCourse, @Req() req: any) {
+    return this.coursesService.create(createCourse, req);
   }
 
   @Get()
-  findAll() {
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur', 'siswa'])
+  findAll(@Req() req: any) {
     return this.coursesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.coursesService.findOne(+id);
-  }
-
-  @Patch(':id')
+  @Put(':id')
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur'])
   update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
     return this.coursesService.update(+id, updateCourseDto);
   }
 
   @Delete(':id')
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur'])
   remove(@Param('id') id: string) {
     return this.coursesService.remove(+id);
   }

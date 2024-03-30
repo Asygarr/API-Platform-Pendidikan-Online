@@ -24,3 +24,8 @@ export class Register {
   @ApiProperty()
   data: Data;
 }
+
+export class LoginUser {
+  @ApiProperty()
+  token: string;
+}

@@ -47,6 +47,7 @@ export class AuthService {
     const rensponse = {
       message: 'User registered successfully.',
       data: {
+        id: registerUser.id,
         name: registerUser.name,
         username: registerUser.username,
         email: registerUser.email,
