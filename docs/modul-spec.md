@@ -34,7 +34,15 @@
 
 ```json
 {
-  "message": "Content is required."
+  "message": "Title or Content is required."
+}
+```
+
+- Error response (Status Code: 404 Not Found) :
+
+```json
+{
+  "message": "Courses is not found."
 }
 ```
 
@@ -68,11 +76,19 @@
 }
 ```
 
-- Error Response (Status Code: 400 Bad Request) :
+- Error response (Status Code: 404 Not Found) :
 
 ```json
 {
-  "message": "Content is required."
+  "message": "Courses or Module is not found."
+}
+```
+
+- Error response (Status Code: 401 Unauthorized) :
+
+```json
+{
+  "message": "You are not authorized to update this course."
 }
 ```
 
@@ -85,6 +101,7 @@
 
 ```json
 {
+  "message": "Modules retrieved successfully",
   "data": [
     {
       "id": "module_id",
@@ -96,10 +113,10 @@
 }
 ```
 
-- Error Response (Status Code: 404 Not Found) :
+- Error response (Status Code: 404 Not Found) :
 
 ```json
 {
-  "message": "Modules not found."
+  "message": "Courses is not found."
 }
 ```
