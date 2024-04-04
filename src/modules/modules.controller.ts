@@ -1,34 +1,109 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  UseGuards,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipeBuilder,
+} from '@nestjs/common';
 import { ModulesService } from './modules.service';
 import { CreateModuleDto } from './dto/create-module.dto';
 import { UpdateModuleDto } from './dto/update-module.dto';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import { RoleGuard } from '../role/role.guard';
+import { Roles } from '../role/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MulterConfig } from '../config/multer.config';
+import {
+  CreateModule,
+  GetModule,
+  UpdateModule,
+} from './entities/module.entity';
 
-@Controller('modules')
+@Controller('/api/courses/:coursesId/modules')
+@ApiTags('modules')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class ModulesController {
   constructor(private readonly modulesService: ModulesService) {}
 
   @Post()
-  create(@Body() createModuleDto: CreateModuleDto) {
-    return this.modulesService.create(createModuleDto);
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur'])
+  @UseInterceptors(
+    FileInterceptor('content', { storage: MulterConfig.storage }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiCreatedResponse({
+    description: 'Created module response',
+    type: CreateModule,
+  })
+  create(
+    @Param('coursesId') coursesId: string,
+    @Body() createModuleDto: CreateModuleDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'mp4|docs|pdf',
+        })
+        .build(),
+    )
+    content: Express.Multer.File,
+    @Req() req: any,
+  ) {
+    return this.modulesService.create(coursesId, createModuleDto, content, req);
   }
 
   @Get()
-  findAll() {
-    return this.modulesService.findAll();
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur', 'siswa'])
+  @ApiOkResponse({ description: 'Get module response', type: GetModule })
+  findAll(@Param('coursesId') coursesId: string) {
+    return this.modulesService.findAll(coursesId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.modulesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateModuleDto: UpdateModuleDto) {
-    return this.modulesService.update(+id, updateModuleDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.modulesService.remove(+id);
+  @Put(':moduleId')
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur'])
+  @UseInterceptors(
+    FileInterceptor('content', { storage: MulterConfig.storage }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse({ description: 'Updated module response', type: UpdateModule })
+  update(
+    @Param('coursesId') coursesId: string,
+    @Param('moduleId') moduleId: string,
+    @Body() updateModuleDto: UpdateModuleDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'mp4|docx|pdf',
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    content: Express.Multer.File,
+    @Req() req: any,
+  ) {
+    return this.modulesService.update(
+      coursesId,
+      moduleId,
+      updateModuleDto,
+      content,
+      req,
+    );
   }
 }
