@@ -112,7 +112,7 @@ export class CoursesService {
   }
 
   async remove(id: string, req: any) {
-    const cekCourse = await this.prisma.courses.findFirst({
+    const cekCourse = await this.prisma.courses.findUnique({
       where: {
         id,
       },
@@ -128,6 +128,12 @@ export class CoursesService {
         HttpStatus.UNAUTHORIZED,
       );
     }
+
+    await this.prisma.modules.deleteMany({
+      where: {
+        course_id: id,
+      },
+    });
 
     await this.prisma.courses.delete({
       where: {
