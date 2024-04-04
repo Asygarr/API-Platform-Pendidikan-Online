@@ -23,6 +23,7 @@ describe('Courses Controller', () => {
 
   describe('POST /api/courses', () => {
     beforeEach(async () => {
+      await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
@@ -94,6 +95,7 @@ describe('Courses Controller', () => {
 
   describe('PUT /api/courses/:id', () => {
     beforeEach(async () => {
+      await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
@@ -111,7 +113,7 @@ describe('Courses Controller', () => {
         .put(`/api/courses/${courseIdUpdate}`)
         .set('Authorization', `Bearer ${loginWrongInstruktur.body.token}`)
         .send({
-          title: 'test',
+          title: 'test update',
           description: 'test',
         });
 
@@ -166,6 +168,7 @@ describe('Courses Controller', () => {
 
   describe('DELETE /api/courses/:id', () => {
     beforeEach(async () => {
+      await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
@@ -244,6 +247,7 @@ describe('Courses Controller', () => {
 
   describe('GET /api/courses', () => {
     beforeEach(async () => {
+      await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 

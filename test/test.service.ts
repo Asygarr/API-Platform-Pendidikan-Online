@@ -125,4 +125,49 @@ export class TestService {
       ],
     });
   }
+
+  async deleteModuleTest() {
+    await this.prisma.modules.deleteMany({
+      where: {
+        title: {
+          contains: 'test',
+        },
+      },
+    });
+  }
+
+  async coursesIdForModuleTest() {
+    const findInstruktur = await this.prisma.user.findFirst({
+      where: {
+        username: 'instruktur',
+      },
+    });
+
+    const createCoursesTest = await this.prisma.courses.create({
+      data: {
+        title: 'test',
+        description: 'test',
+        instructor_id: findInstruktur.id,
+      },
+    });
+
+    return createCoursesTest.id;
+  }
+
+  async createModule() {
+    const coursesId = await this.coursesIdForModuleTest();
+
+    const createModuleTest = await this.prisma.modules.create({
+      data: {
+        title: 'test',
+        content: 'test',
+        course_id: coursesId,
+      },
+    });
+
+    return {
+      coursesId,
+      moduleId: createModuleTest.id,
+    };
+  }
 }
