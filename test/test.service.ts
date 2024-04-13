@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 export class TestService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // Users
   async deleteUserTest() {
     await this.prisma.user.deleteMany({
       where: {
@@ -29,6 +30,7 @@ export class TestService {
     });
   }
 
+  // Courses
   async deleteCoursesTest() {
     await this.prisma.courses.deleteMany({
       where: {
@@ -126,6 +128,7 @@ export class TestService {
     });
   }
 
+  // Modules
   async deleteModuleTest() {
     await this.prisma.modules.deleteMany({
       where: {
@@ -169,5 +172,82 @@ export class TestService {
       coursesId,
       moduleId: createModuleTest.id,
     };
+  }
+
+  async createManyModule(courseId: string) {
+    await this.prisma.modules.createMany({
+      data: [
+        {
+          title: 'test 1',
+          content: 'test 1',
+          course_id: courseId,
+        },
+        {
+          title: 'test 2',
+          content: 'test 2',
+          course_id: courseId,
+        },
+        {
+          title: 'test 3',
+          content: 'test 3',
+          course_id: courseId,
+        },
+        {
+          title: 'test 4',
+          content: 'test 4',
+          course_id: courseId,
+        },
+        {
+          title: 'test 5',
+          content: 'test 5',
+          course_id: courseId,
+        },
+      ],
+    });
+  }
+
+  async getModuleId(courseId: string) {
+    const module1 = await this.prisma.modules.findFirst({
+      where: {
+        course_id: courseId,
+      },
+    });
+
+    const module2 = await this.prisma.modules.findFirst({
+      where: {
+        course_id: courseId,
+        id: {
+          not: module1.id,
+        },
+      },
+    });
+
+    const module3 = await this.prisma.modules.findFirst({
+      where: {
+        course_id: courseId,
+        id: {
+          notIn: [module1.id, module2.id],
+        },
+      },
+    });
+
+    return {
+      module1: module1.id,
+      module2: module2.id,
+      module3: module3.id,
+    };
+  }
+
+  // Enrollment
+  async deleteEnrollmentsTest() {
+    await this.prisma.enrollments.deleteMany({
+      where: {
+        user_id: {
+          not: {
+            equals: 'wrong id test',
+          },
+        },
+      },
+    });
   }
 }
