@@ -66,6 +66,9 @@ export class ModulesService {
     }
 
     const modules = await this.prisma.modules.findMany({
+      where: {
+        course_id: courseId,
+      },
       select: {
         id: true,
         title: true,
