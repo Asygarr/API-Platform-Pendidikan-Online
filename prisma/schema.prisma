@@ -64,18 +64,21 @@ model Modules {
 }
 
 model Enrollments {
-  id            String   @id @default(cuid())
+  id               String   @id @default(cuid())
 
   // relasi dengan tabel User
-  user          User     @relation(fields: [user_id], references: [id])
-  user_id       String
+  user             User     @relation(fields: [user_id], references: [id])
+  user_id          String
 
   // relasi dengan tabel Courses
-  course        Courses  @relation(fields: [course_id], references: [id])
-  course_id     String
+  course           Courses  @relation(fields: [course_id], references: [id])
+  course_id        String
 
   // progress belajar
-  progress      Int
+  progress         Int
+
+  // modul yang sedang sudah di pelajari
+  complatedModules String[]    @default([])
 }
 
 model Posts {
