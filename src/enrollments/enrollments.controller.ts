@@ -1,34 +1,78 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+  Put,
+} from '@nestjs/common';
 import { EnrollmentsService } from './enrollments.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 import { UpdateEnrollmentDto } from './dto/update-enrollment.dto';
+import { RoleGuard } from '../role/role.guard';
+import { Roles } from '../role/roles.decorator';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import {
+  CreatedEnrollment,
+  UpdateEnrollment,
+} from './entities/enrollment.entity';
 
-@Controller('enrollments')
+@Controller('api/enrollments')
+@ApiTags('Enrollments')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class EnrollmentsController {
   constructor(private readonly enrollmentsService: EnrollmentsService) {}
 
   @Post()
-  create(@Body() createEnrollmentDto: CreateEnrollmentDto) {
-    return this.enrollmentsService.create(createEnrollmentDto);
+  @UseGuards(RoleGuard)
+  @Roles(['siswa'])
+  @ApiCreatedResponse({
+    description: 'Enrollment created',
+    type: CreatedEnrollment,
+  })
+  createEnrollemnts(
+    @Body() createEnrollmentDto: CreateEnrollmentDto,
+    @Req() req: any,
+  ) {
+    return this.enrollmentsService.createEnrollment(createEnrollmentDto, req);
   }
 
   @Get()
-  findAll() {
-    return this.enrollmentsService.findAll();
+  @UseGuards(RoleGuard)
+  @Roles(['instruktur', 'siswa'])
+  @ApiOkResponse({
+    description: 'Enrollments retrieved',
+    type: CreatedEnrollment,
+  })
+  getAllEnrollments() {
+    return this.enrollmentsService.getAllEnrollments();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.enrollmentsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEnrollmentDto: UpdateEnrollmentDto) {
-    return this.enrollmentsService.update(+id, updateEnrollmentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.enrollmentsService.remove(+id);
+  @Put(':enrollmentId')
+  @UseGuards(RoleGuard)
+  @Roles(['siswa'])
+  @ApiOkResponse({
+    description: 'Enrollment updated',
+    type: UpdateEnrollment,
+  })
+  updateProggresEnrollment(
+    @Param('enrollmentId') enrollmentId: string,
+    @Req() req: any,
+    @Body() updateEnrollmentDto: UpdateEnrollmentDto,
+  ) {
+    return this.enrollmentsService.updateProgress(
+      enrollmentId,
+      req,
+      updateEnrollmentDto.completedModules,
+    );
   }
 }
