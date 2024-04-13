@@ -135,6 +135,18 @@ export class CoursesService {
       },
     });
 
+    await this.prisma.enrollments.deleteMany({
+      where: {
+        course_id: id,
+      },
+    });
+
+    await this.prisma.posts.deleteMany({
+      where: {
+        course_id: id,
+      },
+    });
+
     await this.prisma.courses.delete({
       where: {
         id,
