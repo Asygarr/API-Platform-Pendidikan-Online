@@ -5,6 +5,7 @@
 - Endpoint : 'POST /api/posts'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Request Body :
 
 ```json
@@ -43,6 +44,7 @@
 - Endpoint : 'PUT /api/posts/:id'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Request Body :
 
 ```json
@@ -95,6 +97,7 @@
 - Endpoint : 'DELETE /api/posts/:id'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Response Sukses (Status Code: 200 OK) :
 
 ```json
@@ -123,6 +126,7 @@
 - Endpoint : 'GET /api/posts/:id'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Response Sukses (Status Code: 200 OK) :
 ```json
 {
@@ -149,6 +153,7 @@
 - Endpoint : 'GET /api/posts?courseId=:courseId'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Response Sukses (Status Code: 200 OK) :
 
 ```json
