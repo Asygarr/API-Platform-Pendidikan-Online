@@ -4,7 +4,12 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { TestService } from './test.service';
 import { TestModule } from './test.module';
-import { describe } from 'node:test';
+import { afterEach, describe } from 'node:test';
+import {
+  loginInstruktur,
+  loginSiswa,
+  loginWrongInstruktur,
+} from '../src/lib/login-test';
 
 describe('Courses Controller', () => {
   let app: INestApplication;
@@ -22,22 +27,18 @@ describe('Courses Controller', () => {
   });
 
   describe('POST /api/courses', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
+      await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
     it('should be able to create courses', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
+      const login = await loginInstruktur(app);
 
       const responses = await request(app.getHttpServer())
         .post('/api/courses')
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .send({
           title: 'test',
           description: 'test',
@@ -53,16 +54,11 @@ describe('Courses Controller', () => {
     });
 
     it('should be rejected if title or description is empty', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
+      const login = await loginInstruktur(app);
 
       const responses = await request(app.getHttpServer())
         .post('/api/courses')
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .send({
           title: '',
           description: '',
@@ -73,16 +69,11 @@ describe('Courses Controller', () => {
     });
 
     it('should be rejected if user is not an instructor', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'siswa@example.com',
-          password: '12345678',
-        });
+      const login = await loginSiswa(app);
 
       const responses = await request(app.getHttpServer())
         .post('/api/courses')
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .send({
           title: 'test',
           description: 'test',
@@ -94,24 +85,19 @@ describe('Courses Controller', () => {
   });
 
   describe('PUT /api/courses/:id', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
+      await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
     it('should be rejected if user is not an instructor', async () => {
       const courseIdUpdate = await testService.createCoursesTest();
-
-      const loginWrongInstruktur = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur2@example.com',
-          password: '12345678',
-        });
+      const login = await loginWrongInstruktur(app);
 
       const responses = await request(app.getHttpServer())
         .put(`/api/courses/${courseIdUpdate}`)
-        .set('Authorization', `Bearer ${loginWrongInstruktur.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .send({
           title: 'test update',
           description: 'test',
@@ -124,16 +110,11 @@ describe('Courses Controller', () => {
     });
 
     it('should be rejected if course not found', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur2@example.com',
-          password: '12345678',
-        });
+      const login = await loginInstruktur(app);
 
       const responses = await request(app.getHttpServer())
         .put(`/api/courses/wrongId`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .send({
           title: 'test',
           description: 'test',
@@ -145,17 +126,11 @@ describe('Courses Controller', () => {
 
     it('should be rejected if user login is not an instructor', async () => {
       const courseIdUpdate = await testService.createCoursesTest();
-
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'siswa@example.com',
-          password: '12345678',
-        });
+      const login = await loginSiswa(app);
 
       const responses = await request(app.getHttpServer())
         .put(`/api/courses/${courseIdUpdate}`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .send({
           title: 'test',
           description: 'test',
@@ -167,24 +142,19 @@ describe('Courses Controller', () => {
   });
 
   describe('DELETE /api/courses/:id', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
+      await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
     it('should be rejected if user is not an instructor', async () => {
       const courseIdDelete = await testService.createCoursesTest();
-
-      const loginWrongInstuktur = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur2@example.com',
-          password: '12345678',
-        });
+      const login = await loginWrongInstruktur(app);
 
       const response = await request(app.getHttpServer())
         .delete('/api/courses/' + courseIdDelete)
-        .set('Authorization', `Bearer ${loginWrongInstuktur.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(response.status).toBe(401);
       expect(response.body.message).toBe(
@@ -193,16 +163,11 @@ describe('Courses Controller', () => {
     });
 
     it('should be rejected if course not found', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
+      const login = await loginInstruktur(app);
 
       const responses = await request(app.getHttpServer())
         .delete(`/api/courses/wrongId`)
-        .set('Authorization', `Bearer ${login.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(responses.status).toBe(404);
       expect(responses.body.message).toBe('Course not found.');
@@ -210,17 +175,11 @@ describe('Courses Controller', () => {
 
     it('should be able to delete courses', async () => {
       const courseIdDelete = await testService.createCoursesTest();
-
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
+      const login = await loginInstruktur(app);
 
       const response = await request(app.getHttpServer())
         .delete('/api/courses/' + courseIdDelete)
-        .set('Authorization', `Bearer ${login.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Courses deleted successfully.');
@@ -228,17 +187,11 @@ describe('Courses Controller', () => {
 
     it('should be rejected if user is not an instructor', async () => {
       const courseIdDelete = await testService.createCoursesTest();
-
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'siswa@example.com',
-          password: '12345678',
-        });
+      const login = await loginSiswa(app);
 
       const responses = await request(app.getHttpServer())
         .delete('/api/courses/' + courseIdDelete)
-        .set('Authorization', `Bearer ${login.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(responses.status).toBe(403);
       expect(responses.body.message).toBe('Forbidden resource');
@@ -246,24 +199,19 @@ describe('Courses Controller', () => {
   });
 
   describe('GET /api/courses', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
+      await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
     it('should be able to get all courses if login as instruktur', async () => {
       await testService.createCoursesTestMany();
-
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
+      const login = await loginInstruktur(app);
 
       const responses = await request(app.getHttpServer())
         .get('/api/courses')
-        .set('Authorization', `Bearer ${login.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(responses.status).toBe(200);
       expect(responses.body.message).toBe('Courses retrieved successfully.');
@@ -272,17 +220,11 @@ describe('Courses Controller', () => {
 
     it('should be able to get all courses if login as siswa', async () => {
       await testService.createCoursesTestMany();
-
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'siswa@example.com',
-          password: '12345678',
-        });
+      const login = await loginSiswa(app);
 
       const responses = await request(app.getHttpServer())
         .get('/api/courses')
-        .set('Authorization', `Bearer ${login.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(responses.status).toBe(200);
       expect(responses.body.message).toBe('Courses retrieved successfully.');
