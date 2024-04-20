@@ -12,7 +12,7 @@ import {
 import { CoursesService } from './courses.service';
 import { CreateCourse } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { RoleGuard } from '../role/role.guard';
+import { RoleGuard } from '../middleware/role/role.guard';
 import { JwtAuthGuard } from '../auth/guard/jwt.guard';
 import {
   ApiBearerAuth,
@@ -20,7 +20,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Roles } from '../role/roles.decorator';
+import { Roles } from '../middleware/role/roles.decorator';
 import {
   CreateCourses,
   DeleteCourses,

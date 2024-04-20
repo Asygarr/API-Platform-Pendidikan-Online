@@ -22,8 +22,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guard/jwt.guard';
-import { RoleGuard } from '../role/role.guard';
-import { Roles } from '../role/roles.decorator';
+import { RoleGuard } from '../middleware/role/role.guard';
+import { Roles } from '../middleware/role/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from '../config/multer.config';
 import {

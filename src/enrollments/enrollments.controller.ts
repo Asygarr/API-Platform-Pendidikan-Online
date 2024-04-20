@@ -11,8 +11,8 @@ import {
 import { EnrollmentsService } from './enrollments.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 import { UpdateEnrollmentDto } from './dto/update-enrollment.dto';
-import { RoleGuard } from '../role/role.guard';
-import { Roles } from '../role/roles.decorator';
+import { RoleGuard } from '../middleware/role/role.guard';
+import { Roles } from '../middleware/role/roles.decorator';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
