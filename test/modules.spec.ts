@@ -4,7 +4,8 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { TestService } from './test.service';
 import { TestModule } from './test.module';
-import { describe } from 'node:test';
+import { describe, afterEach } from 'node:test';
+import { loginInstruktur, loginWrongInstruktur } from '../src/lib/login-test';
 
 describe('Modules Controller', () => {
   let app: INestApplication;
@@ -22,23 +23,19 @@ describe('Modules Controller', () => {
   });
 
   describe('POST /api/courses/:coursesId/modules', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
+      await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
     it('should be able to reject if courses is not found', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const wrongCoursesId = 'nwudba8UBd9ww8bdu9Opqx';
+
       const response = await request(app.getHttpServer())
         .post(`/api/courses/${wrongCoursesId}/modules`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .set('Content-Type', 'multipart/form-data')
         .field('title', 'test')
         .attach('content', 'test/files/test.pdf');
@@ -48,17 +45,12 @@ describe('Modules Controller', () => {
     });
 
     it('should be able to reject if title is empty', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const coursesId = await testService.coursesIdForModuleTest();
+
       const response = await request(app.getHttpServer())
         .post(`/api/courses/${coursesId}/modules`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .set('Content-Type', 'multipart/form-data')
         .field('title', '')
         .attach('content', 'test/files/test.pdf');
@@ -68,17 +60,12 @@ describe('Modules Controller', () => {
     });
 
     it('should be able to create module', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const coursesId = await testService.coursesIdForModuleTest();
+
       const response = await request(app.getHttpServer())
         .post(`/api/courses/${coursesId}/modules`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .set('Content-Type', 'multipart/form-data')
         .field('title', 'test')
         .attach('content', 'test/files/test.pdf');
@@ -90,24 +77,20 @@ describe('Modules Controller', () => {
   });
 
   describe('PUT /api/courses/:coursesId/modules/moduleId', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
+      await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
     it('should be able to reject if unauthorized this module', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur2@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginWrongInstruktur(app);
       const createTestModule = await testService.createModule();
       const { coursesId, moduleId } = createTestModule;
+
       const response = await request(app.getHttpServer())
         .put(`/api/courses/${coursesId}/modules/${moduleId}`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .set('Content-Type', 'multipart/form-data')
         .field('title', 'test update')
         .attach('content', 'test/files/test.pdf');
@@ -119,19 +102,14 @@ describe('Modules Controller', () => {
     });
 
     it('should be able to reject if Courses is not found', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const createTestModule = await testService.createModule();
       const { moduleId } = createTestModule;
       const wrongCoursesId = 'wjbawbdubauwda8wdbuwv27';
+
       const response = await request(app.getHttpServer())
         .put(`/api/courses/${wrongCoursesId}/modules/${moduleId}`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .set('Content-Type', 'multipart/form-data')
         .field('title', 'test update')
         .attach('content', 'test/files/test.pdf');
@@ -141,19 +119,14 @@ describe('Modules Controller', () => {
     });
 
     it('should be able to reject if Module is not found', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const createTestModule = await testService.createModule();
       const { coursesId } = createTestModule;
       const wrongModuleId = 'wjbawbdubauwda8wdbuwv27';
+
       const response = await request(app.getHttpServer())
         .put(`/api/courses/${coursesId}/modules/${wrongModuleId}`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .set('Content-Type', 'multipart/form-data')
         .field('title', 'test update')
         .attach('content', 'test/files/test.pdf');
@@ -163,18 +136,13 @@ describe('Modules Controller', () => {
     });
 
     it('should be able to update this module', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const createTestModule = await testService.createModule();
       const { coursesId, moduleId } = createTestModule;
+
       const response = await request(app.getHttpServer())
         .put(`/api/courses/${coursesId}/modules/${moduleId}`)
-        .set('Authorization', `Bearer ${login.body.token}`)
+        .set('Authorization', `Bearer ${login}`)
         .set('Content-Type', 'multipart/form-data')
         .field('title', 'test update')
         .attach('content', 'test/files/test.pdf');
@@ -186,41 +154,32 @@ describe('Modules Controller', () => {
   });
 
   describe('GET /api/courses/:coursesId/modules', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
+      await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
     });
 
     it('should be able to reject if courses is not found', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const wrongCoursesId = 'nwudba8UBd9ww8bdu9Opqx';
+
       const response = await request(app.getHttpServer())
         .get(`/api/courses/${wrongCoursesId}/modules`)
-        .set('Authorization', `Bearer ${login.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(response.status).toBe(404);
       expect(response.body.message).toEqual('Courses is not found.');
     });
 
     it('should be able to get module', async () => {
-      const login = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'instruktur@example.com',
-          password: '12345678',
-        });
-
+      const login = await loginInstruktur(app);
       const createTestModule = await testService.createModule();
       const { coursesId } = createTestModule;
+
       const response = await request(app.getHttpServer())
         .get(`/api/courses/${coursesId}/modules`)
-        .set('Authorization', `Bearer ${login.body.token}`);
+        .set('Authorization', `Bearer ${login}`);
 
       expect(response.status).toBe(200);
       expect(response.body.message).toEqual('Modules retrieved successfully.');

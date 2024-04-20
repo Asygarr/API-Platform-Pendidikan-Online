@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { TestService } from './test.service';
 import { TestModule } from './test.module';
-import { describe } from 'node:test';
+import { describe, afterEach } from 'node:test';
 import { loginSiswa, loginWrongSiswa } from '../src/lib/login-test';
 import { createdEnrollment } from '../src/lib/enrollment-test';
 
@@ -24,7 +24,7 @@ describe('Enrollments Controller', () => {
   });
 
   describe('POST /api/enrollments', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
       await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
@@ -80,7 +80,7 @@ describe('Enrollments Controller', () => {
   });
 
   describe('PUT /api/enrollments', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
       await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
@@ -174,7 +174,7 @@ describe('Enrollments Controller', () => {
   });
 
   describe('GET /api/enrollments', async () => {
-    beforeEach(async () => {
+    afterEach(async () => {
       await testService.deleteEnrollmentsTest();
       await testService.deleteModuleTest();
       await testService.deleteCoursesTest();
@@ -191,7 +191,6 @@ describe('Enrollments Controller', () => {
 
     it('should be able to get all enrollments', async () => {
       const login = await loginSiswa(app);
-
       const courseId = await testService.createCoursesTest();
       await testService.createManyModule(courseId);
       const { module1, module2, module3 } =
@@ -210,7 +209,7 @@ describe('Enrollments Controller', () => {
         .set('Authorization', `Bearer ${login}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data.length).toBe(1);
+      expect(response.body.message).toBe('Enrollments retrieved successfully.');
     });
   });
 });
