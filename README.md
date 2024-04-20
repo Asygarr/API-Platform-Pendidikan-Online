@@ -51,11 +51,23 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
-
 # test coverage
 $ npm run test:cov
+
+# test auth
+$ npm run test:auth
+
+# test courses
+$ npm run test:courses
+
+# test modules
+$ npm run test:modules
+
+# test enrollments
+$ npm run test:enrollments
+
+# test posts
+$ npm run test:posts
 ```
 
 ## Support
