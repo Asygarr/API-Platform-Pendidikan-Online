@@ -33,6 +33,14 @@ export class UpdateModule {
   data: Data;
 }
 
+export class GetFileModule {
+  @ApiProperty({ example: 'File retrieved successfully.' })
+  message: string;
+
+  @ApiProperty({ example: 'url' })
+  data: string;
+}
+
 export class GetModule {
   @ApiProperty({ example: 'Modules retrieved successfully' })
   message: string;

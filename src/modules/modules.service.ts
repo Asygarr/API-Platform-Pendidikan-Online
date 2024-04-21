@@ -34,14 +34,10 @@ export class ModulesService {
       throw new HttpException('Courses is not found.', HttpStatus.NOT_FOUND);
     }
 
-    const contentUrl = `${req.protocol}://${req.get('host')}/module/file/${
-      content.filename
-    }`;
-
     const createModule = await this.prisma.modules.create({
       data: {
         title: title,
-        content: contentUrl,
+        content: content.filename,
         course_id: coursesId,
       },
     });
@@ -138,19 +134,11 @@ export class ModulesService {
       title = cekModule.title;
     }
 
-    let contentUrl = cekModule.content;
+    let contentSave = cekModule.content;
     if (content) {
-      contentUrl = `${req.protocol}://${req.get('host')}/module/file/${
-        content.filename
-      }`;
+      contentSave = content.filename;
 
-      const splitUrl = cekModule.content.split('/');
-      const contentName = splitUrl[splitUrl.length - 1];
-      const contentPath = `public/module/file/${contentName}`;
-
-      if (fs.existsSync(contentPath)) {
-        fs.unlinkSync(contentPath);
-      }
+      deleteFileDir(cekModule.content);
     }
 
     const updateModule = await this.prisma.modules.update({
@@ -159,7 +147,7 @@ export class ModulesService {
       },
       data: {
         title: title,
-        content: contentUrl,
+        content: contentSave,
         course_id: coursesId,
       },
     });
@@ -167,6 +155,37 @@ export class ModulesService {
     const response = {
       message: 'Module updated successfully.',
       data: updateModule,
+    };
+
+    return response;
+  }
+
+  async getFile(courseId: string, moduleId: string, req: any) {
+    const cekCourses = await this.prisma.courses.findUnique({
+      where: {
+        id: courseId,
+      },
+    });
+
+    if (!cekCourses) {
+      throw new HttpException('Courses is not found.', HttpStatus.NOT_FOUND);
+    }
+
+    const cekModule = await this.prisma.modules.findUnique({
+      where: {
+        id: moduleId,
+      },
+    });
+
+    if (!cekModule) {
+      throw new HttpException('Module is not found.', HttpStatus.NOT_FOUND);
+    }
+
+    const contentUrl = `${req.protocol}://${req.get('host')}/module/file/${cekModule.content}`;
+
+    const response = {
+      message: 'File retrieved successfully.',
+      data: contentUrl,
     };
 
     return response;
