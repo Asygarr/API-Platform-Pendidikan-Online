@@ -92,4 +92,20 @@ export class AuthService {
 
     return response;
   }
+
+  async validateTokenUser(token: string) {
+    const decode = this.jwtService.verify(token);
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: decode.id,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+    }
+
+    return user;
+  }
 }
