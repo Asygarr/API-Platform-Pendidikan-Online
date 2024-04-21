@@ -28,6 +28,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from '../config/multer.config';
 import {
   CreateModule,
+  GetFileModule,
   GetModule,
   UpdateModule,
 } from './entities/module.entity';
@@ -70,7 +71,7 @@ export class ModulesController {
   @UseGuards(RoleGuard)
   @Roles(['instruktur', 'siswa'])
   @ApiOkResponse({ description: 'Get module response', type: GetModule })
-  findAll(@Param('coursesId') coursesId: string) {
+  findAll(@Param('coursesId') coursesId: string, @Req() req: any) {
     return this.modulesService.findAll(coursesId);
   }
 
@@ -105,5 +106,20 @@ export class ModulesController {
       content,
       req,
     );
+  }
+
+  @Get(':moduleId/file')
+  @UseGuards(RoleGuard)
+  @Roles(['siswa', 'instruktur'])
+  @ApiOkResponse({
+    description: 'Get file response',
+    type: GetFileModule,
+  })
+  getFile(
+    @Param('coursesId') coursesId: string,
+    @Param('moduleId') moduleId: string,
+    @Req() req: any,
+  ) {
+    return this.modulesService.getFile(coursesId, moduleId, req);
   }
 }
