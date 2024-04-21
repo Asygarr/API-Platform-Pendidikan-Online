@@ -19,5 +19,6 @@ const configService = new ConfigService();
       signOptions: { expiresIn: '7d' },
     }),
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}
