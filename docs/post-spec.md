@@ -5,6 +5,7 @@
 - Endpoint : 'POST /api/posts'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Request Body :
 
 ```json
@@ -43,6 +44,7 @@
 - Endpoint : 'PUT /api/posts/:id'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Request Body :
 
 ```json
@@ -95,6 +97,7 @@
 - Endpoint : 'DELETE /api/posts/:id'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Response Sukses (Status Code: 200 OK) :
 
 ```json
@@ -119,20 +122,35 @@
 }
 ```
 
-### Mengambil Detail Posting
+### Mengambil Daftar Posting
+
 - Endpoint : 'GET /api/posts/:id'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Response Sukses (Status Code: 200 OK) :
+
 ```json
 {
-  "data": {
-    "id": "post_id",
-    "content": "string",
-    "user_id": "user_id",
-    "course_id": "course_id",
-    "parent_post_id": "optional_parent_post_id"
-  }
+  "message": "The record has been successfully retrieved.",
+  "data": [
+    {
+      "id": "post_id",
+      "content": "string",
+      "user_id": "user_id",
+      "course_id": "course_id",
+      "parent_post_id": "optional_parent_post_id",
+      "childPosts": [
+        {
+          "id": "child_post_id",
+          "content": "string",
+          "user_id": "user_id",
+          "course_id": "course_id",
+          "parent_post_id": "post_id"
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -144,31 +162,40 @@
 }
 ```
 
-### Mengambil daftar posting dalam kursus
+### Mengambil Detail Posting
 
-- Endpoint : 'GET /api/posts?courseId=:courseId'
+- Endpoint : 'GET /api/posts/:id'
 - Request Header :
   - Authorization: Bearer
+- Role : siswa, instruktur
 - Response Sukses (Status Code: 200 OK) :
 
 ```json
 {
-  "data": [
-    {
-      "id": "post_id",
-      "content": "string",
-      "user_id": "user_id",
-      "course_id": "course_id",
-      "parent_post_id": "optional_parent_post_id"
-    }
-  ]
+  "message": "The record has been successfully retrieved.",
+  "data": {
+    "id": "post_id",
+    "content": "string",
+    "user_id": "user_id",
+    "course_id": "course_id",
+    "parent_post_id": "optional_parent_post_id",
+    "childPosts": [
+      {
+        "id": "child_post_id",
+        "content": "string",
+        "user_id": "user_id",
+        "course_id": "course_id",
+        "parent_post_id": "post_id"
+      }
+    ]
+  }
 }
 ```
 
-- Error Response (Status Code: 400 Bad Request) :
+- Error Response (Status Code: 404 Not Found) :
 
 ```json
 {
-  "message": "Invalid course ID."
+  "message": "Post not found."
 }
 ```
