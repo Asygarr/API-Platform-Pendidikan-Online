@@ -29,3 +29,13 @@ export class LoginUser {
   @ApiProperty({ example: 'JWT Token' })
   token: string;
 }
+
+export class RefreshToken {
+  @ApiProperty({ example: 'JWT Refresh Token' })
+  token: string;
+}
+
+export class Logout {
+  @ApiProperty({ example: 'Logout successfully.' })
+  message: string;
+}

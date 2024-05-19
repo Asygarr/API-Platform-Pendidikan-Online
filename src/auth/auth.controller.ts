@@ -1,8 +1,14 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, Req, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Login, Register } from './dto/create-auth.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { LoginUser, RegisterUser } from './entities/auth.entity';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  LoginUser,
+  Logout,
+  RefreshToken,
+  RegisterUser,
+} from './entities/auth.entity';
+import { Response } from 'express';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -14,13 +20,40 @@ export class AuthController {
     description: 'User registered',
     type: RegisterUser,
   })
-  register(@Body() Register: Register) {
+  async register(@Body() Register: Register) {
     return this.authService.register(Register);
   }
 
   @Post('login')
   @ApiCreatedResponse({ description: 'Login User', type: LoginUser })
-  login(@Body() login: Login) {
-    return this.authService.login(login);
+  async login(@Body() login: Login, @Res() res: Response) {
+    const response = await this.authService.login(login);
+
+    res.cookie('refreshToken', response.refreshToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+    });
+
+    res.json({
+      token: response.token,
+    });
+  }
+
+  @Get('refresh-token')
+  @ApiOkResponse({ description: 'Refresh Token', type: RefreshToken })
+  async refreshToken(@Req() req: Request) {
+    return this.authService.refreshToken(req);
+  }
+
+  @Delete('logout')
+  @ApiOkResponse({ description: 'Logout', type: Logout })
+  async logout(@Req() req: Request, @Res() res: Response) {
+    const response = await this.authService.logout(req);
+
+    res.clearCookie('refreshToken');
+
+    res.json({
+      message: response.message,
+    });
   }
 }

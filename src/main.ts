@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,10 +20,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.enableCors();
+  const configService = app.get(ConfigService);
+  app.enableCors({
+    credentials: true,
+  });
+  app.use(cookieParser(configService.get('COOKIE_SECRET')));
   app.useStaticAssets('public');
 
-  const configService = app.get(ConfigService);
   await app.listen(configService.get('PORT') || 5000);
 }
 bootstrap();

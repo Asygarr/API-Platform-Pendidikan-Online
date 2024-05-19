@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id        String         @id @default(cuid())
-  name      String   
-  username  String         @unique
-  email     String         @unique
-  password  String
-  role      String         // instruktur atau siswa
-  cretaedAt DateTime       @default(now())
+  id            String         @id @default(cuid())
+  name          String   
+  username      String         @unique
+  email         String         @unique
+  password      String
+  role          String         // instruktur atau siswa
+  refresh_token String?
+  cretaedAt     DateTime       @default(now())
 
   // relasi ke model courses
   courses_  Courses[]

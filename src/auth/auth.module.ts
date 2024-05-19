@@ -7,17 +7,18 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../connection/prisma.service';
 import { JwtStartegy } from './strategy/jwt-strategy';
 
-const configService = new ConfigService();
+// const configService = new ConfigService();
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, PrismaService, JwtStartegy],
   imports: [
     PassportModule,
-    JwtModule.register({
-      secret: configService.get('JWT_SECRET'),
-      signOptions: { expiresIn: '7d' },
-    }),
+    JwtModule,
+    // JwtModule.register({
+    //   secret: configService.get('JWT_ACCESS_SECRET'),
+    //   signOptions: { expiresIn: '7d' },
+    // }),
   ],
   exports: [AuthService],
 })
