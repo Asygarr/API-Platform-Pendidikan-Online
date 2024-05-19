@@ -7,7 +7,6 @@ import { PostsModule } from './posts/posts.module';
 import { ConfigModule } from '@nestjs/config';
 import { AccessControlFile } from './middleware/access-control-file.middleware';
 import { PrismaService } from './connection/prisma.service';
-import { ModulesController } from './modules/modules.controller';
 
 @Module({
   imports: [

@@ -11,7 +11,7 @@ export class JwtStartegy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly prismaService: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.get('JWT_SECRET'),
+      secretOrKey: configService.get('JWT_ACCESS_SECRET'),
     });
   }
 
