@@ -34,6 +34,20 @@ class DataUpdateCourse {
   updatedAt: Date;
 }
 
+class Pagging {
+  @ApiProperty()
+  total: number;
+
+  @ApiProperty()
+  page: number;
+
+  @ApiProperty()
+  size: number;
+
+  @ApiProperty()
+  totalPage: number;
+}
+
 export class CreateCourses {
   @ApiProperty({ example: 'Courses created successfully.' })
   message: string;
@@ -61,4 +75,7 @@ export class GetCourses {
 
   @ApiProperty({ type: [DataCreateCourse] })
   data: DataCreateCourse[];
+
+  @ApiProperty({ type: Pagging })
+  pagging: Pagging;
 }

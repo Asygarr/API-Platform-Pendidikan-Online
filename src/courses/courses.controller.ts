@@ -8,6 +8,8 @@ import {
   UseGuards,
   Req,
   Put,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourse } from './dto/create-course.dto';
@@ -18,6 +20,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from '../middleware/role/roles.decorator';
@@ -27,6 +30,7 @@ import {
   GetCourses,
   UpdateCourses,
 } from './entities/course.entity';
+import { title } from 'node:process';
 
 @Controller('api/courses')
 @ApiTags('courses')
@@ -49,12 +53,19 @@ export class CoursesController {
   @Get()
   @UseGuards(RoleGuard)
   @Roles(['instruktur', 'siswa'])
+  @ApiQuery({ name: 'title', required: false })
+  @ApiQuery({ name: 'description', required: false })
+  @ApiQuery({ name: 'page', required: false })
   @ApiOkResponse({
     description: 'Courses retrieved',
     type: GetCourses,
   })
-  findAll() {
-    return this.coursesService.findAll();
+  async searchCourses(
+    @Query('title') title?: string,
+    @Query('description') desc?: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+  ) {
+    return this.coursesService.searchCourses(title, desc, page);
   }
 
   @Put(':id')
