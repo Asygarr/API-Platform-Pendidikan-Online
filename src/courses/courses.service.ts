@@ -40,8 +40,32 @@ export class CoursesService {
     return responses;
   }
 
-  async findAll() {
-    const courses = await this.prisma.courses.findMany({
+  async searchCourses(title?: string, desc?: string, page?: number) {
+    const filters = [];
+    const size = 10;
+
+    if (title) {
+      filters.push({
+        title: {
+          contains: title,
+        },
+      });
+    }
+
+    if (desc) {
+      filters.push({
+        description: {
+          contains: desc,
+        },
+      });
+    }
+
+    const skip = page ? (page - 1) * size : 0;
+
+    const course = await this.prisma.courses.findMany({
+      where: {
+        AND: filters,
+      },
       select: {
         id: true,
         title: true,
@@ -49,14 +73,26 @@ export class CoursesService {
         instructor_id: true,
         cretaedAt: true,
       },
+      take: size,
+      skip: skip,
     });
 
-    const response = {
-      message: 'Courses retrieved successfully.',
-      data: courses,
-    };
+    const total = await this.prisma.courses.count({
+      where: {
+        AND: filters,
+      },
+    });
 
-    return response;
+    return {
+      message: 'Courses retrieved successfully.',
+      data: course,
+      pagging: {
+        total: total,
+        page: page || 1,
+        size: size,
+        totalPage: Math.ceil(total / size),
+      },
+    };
   }
 
   async update(id: string, updateCourseDto: UpdateCourseDto, req: any) {
